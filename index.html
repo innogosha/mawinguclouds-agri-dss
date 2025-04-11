@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MawinguClouds Agri-DSS</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>MawinguClouds Agri-DSS 🌾</h1>
+    <nav>
+      <a href="#crop">Mazao</a>
+      <a href="#fertilizer">Mbolea</a>
+      <a href="#irrigation">Umwagiliaji</a>
+    </nav>
+  </header>
+  <main>
+    <section id="crop">
+      <h2>Chagua Mazao</h2>
+      <label>Aina ya Udongo:</label>
+      <select id="soilType">
+        <option value="sandy">Mchanga (Sandy)</option>
+        <option value="loam">Tifutifu (Loam)</option>
+        <option value="clay">Mfinyanzi (Clay)</option>
+      </select>
+      <button onclick="recommendCrop()">Pendekeza Mazao</button>
+      <div id="cropResult"></div>
+    </section>
+    <section id="fertilizer">
+      <h2>Mapendekezo ya Mbolea</h2>
+      <p>Ingiza maelezo kupata pendekezo la mbolea.</p>
+    </section>
+    <section id="irrigation">
+      <h2>Ratiba ya Umwagiliaji</h2>
+      <p>Panga umwagiliaji kulingana na aina ya udongo na hali ya hewa.</p>
+    </section>
+    <button onclick="window.print()">Pakua PDF</button>
+  </main>
+  <footer>
+    <p>&copy; 2025 MawinguClouds Agri-DSS</p>
+  </footer>
+  <script src="firebase-config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
