@@ -8,6 +8,30 @@
 <body>
   <h2>Welcome to Agri DSS Dashboard 🌾</h2>
   <button onclick="logout()">Logout</button>
+<h3>🧪 Mpango wa Mbolea (Fertilizer Planner)</h3>
+<form id="fertilizerForm">
+  <label>Chagua zao: 
+    <select id="selectedCrop">
+      <option value="maize">Mahindi (Maize)</option>
+      <option value="rice">Mpunga (Rice)</option>
+      <option value="beans">Maharage (Beans)</option>
+      <option value="cassava">Muhogo (Cassava)</option>
+    </select>
+  </label><br>
+
+  <label>Aina ya Udongo: 
+    <select id="fertSoilType">
+      <option value="loamy">Loamy - Udongo Tifu</option>
+      <option value="clay">Clay - Udongo wa Mfinyanzi</option>
+      <option value="sandy">Sandy - Udongo wa Mchanga</option>
+      <option value="sandy loam">Sandy Loam - Mchanganyiko</option>
+    </select>
+  </label><br>
+
+  <button type="submit">Pata Mapendekezo ya Mbolea</button>
+</form>
+
+<p id="fertilizerResults"></p>
 
   <script>
     const firebaseConfig = {
@@ -30,5 +54,78 @@
       });
     }
   </script>
+<h3>🌾 Chagua Mazao Yafaa (Crop Selector)</h3>
+<form id="cropForm">
+  <label>pH ya Udongo: <input type="number" step="0.1" id="soilPh"></label><br>
+
+  <label>Aina ya Udongo (Soil Type): 
+    <select id="soilType">
+      <option value="loamy">Loamy - Udongo Tifu</option>
+      <option value="clay">Clay - Udongo wa Mfinyanzi</option>
+      <option value="sandy">Sandy - Udongo wa Mchanga</option>
+      <option value="sandy loam">Sandy Loam - Mchanganyiko wa Mchanga na Tifu</option>
+    </select>
+  </label><br>
+
+  <label>Mvua kwa mwaka (mm): <input type="number" id="rainfall"></label><br>
+  <label>Joto wastani (°C): <input type="number" id="temperature"></label><br>
+  <button type="submit">Pata Mapendekezo</button>
+</form>
+
+<p id="cropResults"></p>
+
+<!-- Maelezo ya aina za udongo -->
+<small>
+  <strong>Maelezo ya Aina za Udongo:</strong><br>
+  - <strong>Loamy (Udongo Tifu)</strong>: Mchanganyiko mzuri, unafaa kwa mazao mengi<br>
+  - <strong>Clay (Udongo wa Mfinyanzi)</strong>: Mzito, hushikilia maji muda mrefu<br>
+  - <strong>Sandy (Udongo wa Mchanga)</strong>: Mwepesi, hupitisha maji haraka<br>
+  - <strong>Sandy Loam (Mchanganyiko)</strong>: Mchanganyiko wenye rutuba na usawa<br>
+</small>
+
+<script>
+  document.getElementById("cropForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const soilPh = parseFloat(document.getElementById("soilPh").value);
+    const soilType = document.getElementById("soilType").value.toLowerCase();
+    const rainfall = parseFloat(document.getElementById("rainfall").value);
+    const temperature = parseFloat(document.getElementById("temperature").value);
+
+    const crops = [
+      { name: "Mahindi (Maize)", ph: [5.5, 7.5], soil: ["loamy"], rain: [500, 1200], temp: [18, 27] },
+      { name: "Mpunga (Rice)", ph: [5.0, 6.5], soil: ["clay", "loamy"], rain: [1200, 1600], temp: [21, 32] },
+      { name: "Maharage (Beans)", ph: [6.0, 7.5], soil: ["sandy loam"], rain: [500, 800], temp: [16, 24] },
+      { name: "Muhogo (Cassava)", ph: [4.5, 7.5], soil: ["sandy"], rain: [500, 1000], temp: [20, 30] }
+    ];
+
+    const suitable = crops.filter(crop =>
+      soilPh >= crop.ph[0] && soilPh <= crop.ph[1] &&
+      crop.soil.includes(soilType) &&
+      rainfall >= crop.rain[0] && rainfall <= crop.rain[1] &&
+      temperature >= crop.temp[0] && temperature <= crop.temp[1]
+    );
+
+    if (suitable.length > 0) {
+      const cropNames = suitable.map(c => `✅ ${c.name}`).join("<br>");
+      document.getElementById("cropResults").innerHTML = "Mazao Yanayopendekezwa:<br>" + cropNames;
+
+      // Hifadhi Firebase
+      const user = firebase.auth().currentUser;
+      if (user) {
+        firebase.firestore().collection("cropRecommendations").add({
+          uid: user.uid,
+          soilPh, soilType, rainfall, temperature,
+          recommendedCrops: suitable.map(c => c.name),
+          createdAt: new Date()
+        });
+      }
+    } else {
+      document.getElementById("cropResults").innerHTML = "❌ Hakuna mazao yanayofaa kwa masharti haya.";
+    }
+  });
+</script>
+
+  
 </body>
 </html>
