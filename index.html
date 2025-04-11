@@ -1,53 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MawinguClouds Agri-DSS</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Agri DSS Login</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
-  <header>
-    <h1>Karibu MawinguClouds Agri-DSS</h1>
-    <nav>
-      <a href="#crop">Crop Planner</a>
-      <a href="#fertilizer">Fertilizer</a>
-      <a href="#irrigation">Irrigation</a>
-      <a href="dashboard.html">Dashboard</a>
-    </nav>
-  </header>
+  <h2>Agri DSS - Login/Register</h2>
 
-  <main>
-    <section id="crop">
-      <h2>Crop Planner</h2>
-      <form id="cropForm">
-        <label>Soil Type:
-          <select name="soil">
-            <option value="loamy">Loamy</option>
-            <option value="clay">Clay</option>
-            <option value="sandy">Sandy</option>
-          </select>
-        </label>
-        <label>pH Level:
-          <input type="number" step="0.1" name="ph">
-        </label>
-        <label>Rainfall (mm):
-          <input type="number" name="rain">
-        </label>
-        <label>Temperature (°C):
-          <input type="number" name="temp">
-        </label>
-        <button type="submit">Get Recommendations</button>
-      </form>
-      <div id="cropResult"></div>
-    </section>
-  </main>
+  <div>
+    <input type="email" id="email" placeholder="Email"><br>
+    <input type="password" id="password" placeholder="Password"><br>
+    <button onclick="register()">Register</button>
+    <button onclick="login()">Login</button>
+  </div>
 
-  <footer>
-    <p>&copy; 2025 MawinguClouds</p>
-  </footer>
+  <p id="message"></p>
 
-  <script src="firebase-config.js"></script>
-  <script src="app.js"></script>
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDi4kXVNOw7CTcoq9oJeTudpRwV5z6tbWc",
+      authDomain: "mawinguclouds-agri-dss.firebaseapp.com",
+      projectId: "mawinguclouds-agri-dss",
+      storageBucket: "mawinguclouds-agri-dss.firebasestorage.app",
+      messagingSenderId: "284741605570",
+      appId: "1:284741605570:web:b826d8e5b67f1354e8835b",
+      measurementId: "G-15D6YCEXNL"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    function register() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          db.collection("users").doc(user.uid).set({
+            email: user.email,
+            createdAt: new Date()
+          });
+          document.getElementById("message").innerText = "✅ Registered successfully!";
+        })
+        .catch((error) => {
+          document.getElementById("message").innerText = "❌ " + error.message;
+        });
+    }
+
+    function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+          document.getElementById("message").innerText = "✅ Login successful!";
+          window.location.href = "dashboard.html";
+        })
+        .catch((error) => {
+          document.getElementById("message").innerText = "❌ " + error.message;
+        });
+    }
+  </script>
 </body>
 </html>
